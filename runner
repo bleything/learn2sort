@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+
+%w[ bubble insertion merge selection ].each do |algo|
+  require "./algorithms/#{algo}_sort"
+end
+
+module ArrayHelpers
+  def swap! x, y
+    self[x], self[y] = self[y], self[x]
+  end
+end
+
+# ARRAY_SIZES = [0, 1, 2, 100]#, 500]
+ARRAY_SIZES=[100]
+CORRECTNESS_CHECKS = 100
+
+ALGORITHMS = [
+  BubbleSort,
+  InsertionSort,
+  MergeSort,
+  SelectionSort,
+]
+
+def prepare_array(size = ARRAY_SIZE)
+  (1..size).to_a.shuffle.extend ArrayHelpers
+end
+
+ALGORITHMS.each do |algo|
+  puts "Running correctness checks for #{algo}..."
+
+  ARRAY_SIZES.each do |size|
+    print " * %3d elements..." % [size]
+  begin
+    CORRECTNESS_CHECKS.times do
+      ary = prepare_array(size)
+      ary.extend algo
+      ary.do_sort!
+
+      unless ary == ary.sort
+        p ary
+        p ary.sort
+
+        raise "correctness check failed"
+      end
+    end
+  rescue => e
+    puts "failed: #{e.message}"
+  else
+    puts "success!"
+  end
+  end
+
+  puts # blank line
+end
